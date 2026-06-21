@@ -1,0 +1,297 @@
+{
+  "eval_cases": [
+    {
+      "prompt": {
+        "parts": [
+          {
+            "text": "Analyze the pricing page at https://mock-competitor.com/pricing and compare it to our standard plans."
+          }
+        ],
+        "role": "user"
+      },
+      "responses": [
+        {
+          "response": {
+            "parts": [
+              {
+                "text": "I have retrieved our company's pricing catalog:\n\n**SaaSify Inc. Plans:**\n*   **Starter:** $15 per user/month (or $12 per user/month with annual billing).\n    *   Features: Up to 5 users, Core workflow automation, Basic dashboard reporting, Email support.\n*   **Professional:** $49 per user/month (or $39 per user/month with annual billing).\n    *   Features: Up to 50 users, Advanced analytics, Custom integrations, 24/7 priority support, SLA uptime guarantee.\n*   **Enterprise:** Custom pricing.\n    *   Features: Unlimited users, Dedicated account manager, Custom security & compliance, Single Sign-On (SSO), Custom SLA.\n\nTo perform a side-by-side comparison and calculate price differences, I now need the pricing details from the competitor's page at \"https://mock-competitor.com/pricing\", which the `scout_agent` was tasked to extract. Please provide this information so I can complete the analysis."
+              }
+            ],
+            "role": "model"
+          }
+        }
+      ],
+      "eval_case_id": "analyze_mock_competitor",
+      "agent_data": {
+        "agents": {
+          "coordinator_agent": {
+            "agent_id": "coordinator_agent",
+            "agent_type": "LlmAgent",
+            "description": "",
+            "instruction": "You are the SaaS Pricing & Intelligence Coordinator.\nYour mission is to perform competitive intelligence for our company.\n\nWhen a user asks you to analyze a competitor pricing page (e.g., by URL):\n1. Delegate to the scout_agent to fetch and summarize the competitor's pricing details.\n2. Delegate to the analyst_agent to compare those details with our own internal catalog.\n3. Combine their outputs to generate a comprehensive competitive intelligence report.\n   The report must be in Markdown format and include:\n   - Executive Summary\n   - Side-by-Side Comparison Table (Competitor Tiers vs. Our Tiers)\n   - Price Differentials (mathematical comparisons/percentage differences)\n   - Identified Feature Gaps\n   - Strategic Recommendations (e.g., optimize pricing, introduce a mid-tier, bundle features)\n4. Call the save_intelligence_report tool to save the report locally.\n5. Present the report to the user.\n6. If the user approves of the recommended strategy, offer to call the export_pricing_strategy tool to write changes to production.",
+            "tools": [
+              {
+                "function_declarations": [
+                  {
+                    "description": "Saves the competitive intelligence report to a local markdown file.\n\nArgs:\n    report_markdown: The markdown content of the generated report.\n    competitor_name: The name or slug of the competitor (used to name the file).\n\nReturns:\n    A dictionary containing the status and the path of the saved report.",
+                    "name": "save_intelligence_report",
+                    "parameters_json_schema": {
+                      "properties": {
+                        "report_markdown": {
+                          "title": "Report Markdown",
+                          "type": "string"
+                        },
+                        "competitor_name": {
+                          "title": "Competitor Name",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "report_markdown",
+                        "competitor_name"
+                      ],
+                      "title": "save_intelligence_reportParams",
+                      "type": "object"
+                    }
+                  }
+                ]
+              },
+              {
+                "function_declarations": [
+                  {
+                    "description": "Simulates exporting the recommended strategic pricing tiers to the production catalog.\n\nWARNING: This is a sensitive action that updates active product pricing structures.\n\nArgs:\n    recommended_tiers: A list of dictionaries representing the recommended new/updated plans.\n                       Each dict should contain 'name', 'price_monthly', and 'features'.\n\nReturns:\n    A dictionary containing the export status.",
+                    "name": "export_pricing_strategy",
+                    "parameters_json_schema": {
+                      "properties": {
+                        "recommended_tiers": {
+                          "items": {},
+                          "title": "Recommended Tiers",
+                          "type": "array"
+                        }
+                      },
+                      "required": [
+                        "recommended_tiers"
+                      ],
+                      "title": "export_pricing_strategyParams",
+                      "type": "object"
+                    }
+                  }
+                ]
+              }
+            ],
+            "sub_agents": [
+              "scout_agent",
+              "analyst_agent"
+            ]
+          },
+          "scout_agent": {
+            "agent_id": "scout_agent",
+            "agent_type": "LlmAgent",
+            "description": "Crawls, fetches, and extracts raw pricing details from competitor URLs.",
+            "instruction": "You are the Scout Agent.\nYour sole job is to fetch and extract raw pricing information from competitor pricing links using the fetch_web_page tool.\nProvide a clean summary of the plan names, prices, billing frequency, and key features found.\nDo not compare them to our own plans—just report the competitor facts.",
+            "tools": [
+              {
+                "function_declarations": [
+                  {
+                    "description": "Fetches a web page by URL, parses the HTML, and returns the cleaned text.\n\nArgs:\n    url: The absolute HTTP/HTTPS URL of the web page to fetch.",
+                    "name": "fetch_web_page",
+                    "parameters_json_schema": {
+                      "properties": {
+                        "url": {
+                          "title": "Url",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "url"
+                      ],
+                      "title": "fetch_web_pageParams",
+                      "type": "object"
+                    }
+                  }
+                ]
+              }
+            ],
+            "sub_agents": []
+          },
+          "analyst_agent": {
+            "agent_id": "analyst_agent",
+            "agent_type": "LlmAgent",
+            "description": "Queries our internal pricing catalog and performs mathematical comparison analysis.",
+            "instruction": "You are the Analyst Agent.\nYour job is to fetch our internal SaaS pricing catalog using the get_own_pricing_catalog tool.\nCompare our plans side-by-side with the competitor pricing provided by the Scout Agent.\nCalculate price differences (in percentages), identify features we lack, and highlight gaps or opportunities.",
+            "tools": [
+              {
+                "function_declarations": [
+                  {
+                    "description": "Returns our company's own product pricing catalog (plans, pricing, and features).",
+                    "name": "get_own_pricing_catalog"
+                  }
+                ]
+              }
+            ],
+            "sub_agents": []
+          }
+        },
+        "turns": [
+          {
+            "turn_index": 0,
+            "turn_id": "turn_0",
+            "events": [
+              {
+                "author": "coordinator_agent",
+                "content": {
+                  "parts": [
+                    {
+                      "function_call": {
+                        "id": "adk-20e45f51-6a44-4114-baa2-7adf227ea579",
+                        "args": {
+                          "agent_name": "scout_agent"
+                        },
+                        "name": "transfer_to_agent"
+                      }
+                    }
+                  ],
+                  "role": "model"
+                }
+              },
+              {
+                "author": "coordinator_agent",
+                "content": {
+                  "parts": [
+                    {
+                      "function_response": {
+                        "id": "adk-20e45f51-6a44-4114-baa2-7adf227ea579",
+                        "name": "transfer_to_agent",
+                        "response": {
+                          "result": null
+                        }
+                      }
+                    }
+                  ],
+                  "role": "user"
+                }
+              },
+              {
+                "author": "scout_agent",
+                "content": {
+                  "parts": [
+                    {
+                      "function_call": {
+                        "id": "adk-aac8defb-e4cf-4e6b-bb78-a0b224fd9d8e",
+                        "args": {
+                          "agent_name": "analyst_agent"
+                        },
+                        "name": "transfer_to_agent"
+                      }
+                    }
+                  ],
+                  "role": "model"
+                }
+              },
+              {
+                "author": "scout_agent",
+                "content": {
+                  "parts": [
+                    {
+                      "function_response": {
+                        "id": "adk-aac8defb-e4cf-4e6b-bb78-a0b224fd9d8e",
+                        "name": "transfer_to_agent",
+                        "response": {
+                          "result": null
+                        }
+                      }
+                    }
+                  ],
+                  "role": "user"
+                }
+              },
+              {
+                "author": "analyst_agent",
+                "content": {
+                  "parts": [
+                    {
+                      "function_call": {
+                        "id": "adk-09fcae0f-6afe-4aee-9740-9b0950e73058",
+                        "args": {},
+                        "name": "get_own_pricing_catalog"
+                      }
+                    }
+                  ],
+                  "role": "model"
+                }
+              },
+              {
+                "author": "analyst_agent",
+                "content": {
+                  "parts": [
+                    {
+                      "function_response": {
+                        "id": "adk-09fcae0f-6afe-4aee-9740-9b0950e73058",
+                        "name": "get_own_pricing_catalog",
+                        "response": {
+                          "company_name": "SaaSify Inc.",
+                          "plans": [
+                            {
+                              "name": "Starter",
+                              "price_monthly": 15,
+                              "price_yearly_monthly_equivalent": 12,
+                              "billing": "per user / month",
+                              "features": [
+                                "Up to 5 users",
+                                "Core workflow automation",
+                                "Basic dashboard reporting",
+                                "Email support"
+                              ]
+                            },
+                            {
+                              "name": "Professional",
+                              "price_monthly": 49,
+                              "price_yearly_monthly_equivalent": 39,
+                              "billing": "per user / month",
+                              "features": [
+                                "Up to 50 users",
+                                "Advanced analytics",
+                                "Custom integrations",
+                                "24/7 priority support",
+                                "SLA uptime guarantee"
+                              ]
+                            },
+                            {
+                              "name": "Enterprise",
+                              "price_monthly": "Custom",
+                              "price_yearly_monthly_equivalent": "Custom",
+                              "billing": "custom terms",
+                              "features": [
+                                "Unlimited users",
+                                "Dedicated account manager",
+                                "Custom security & compliance",
+                                "Single Sign-On (SSO)",
+                                "Custom SLA"
+                              ]
+                            }
+                          ]
+                        }
+                      }
+                    }
+                  ],
+                  "role": "user"
+                }
+              },
+              {
+                "author": "analyst_agent",
+                "content": {
+                  "parts": [
+                    {
+                      "text": "I have retrieved our company's pricing catalog:\n\n**SaaSify Inc. Plans:**\n*   **Starter:** $15 per user/month (or $12 per user/month with annual billing).\n    *   Features: Up to 5 users, Core workflow automation, Basic dashboard reporting, Email support.\n*   **Professional:** $49 per user/month (or $39 per user/month with annual billing).\n    *   Features: Up to 50 users, Advanced analytics, Custom integrations, 24/7 priority support, SLA uptime guarantee.\n*   **Enterprise:** Custom pricing.\n    *   Features: Unlimited users, Dedicated account manager, Custom security & compliance, Single Sign-On (SSO), Custom SLA.\n\nTo perform a side-by-side comparison and calculate price differences, I now need the pricing details from the competitor's page at \"https://mock-competitor.com/pricing\", which the `scout_agent` was tasked to extract. Please provide this information so I can complete the analysis."
+                    }
+                  ],
+                  "role": "model"
+                }
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

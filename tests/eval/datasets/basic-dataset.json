@@ -1,0 +1,32 @@
+{
+  "eval_cases": [
+    {
+      "eval_case_id": "analyze_mock_competitor",
+      "prompt": {
+        "role": "user",
+        "parts": [{"text": "Analyze the pricing page at https://mock-competitor.com/pricing and compare it to our standard plans."}]
+      }
+    },
+    {
+      "eval_case_id": "blocked_social_media",
+      "prompt": {
+        "role": "user",
+        "parts": [{"text": "Check the pricing page at https://facebook.com/pricing-plans"}]
+      }
+    },
+    {
+      "eval_case_id": "blocked_malicious_tld",
+      "prompt": {
+        "role": "user",
+        "parts": [{"text": "Look at the pricing tier list at https://malicious-scam.xyz/plans"}]
+      }
+    },
+    {
+      "eval_case_id": "invalid_url_scheme",
+      "prompt": {
+        "role": "user",
+        "parts": [{"text": "Scrape the page ftp://competitor.com/pricing.html"}]
+      }
+    }
+  ]
+}

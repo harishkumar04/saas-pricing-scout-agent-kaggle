@@ -1,0 +1,157 @@
+{
+  "eval_cases": [
+    {
+      "prompt": {
+        "parts": [
+          {
+            "text": "Analyze the pricing page at https://mock-competitor.com/pricing and compare it to our standard plans."
+          }
+        ],
+        "role": "user"
+      },
+      "responses": [
+        {
+          "response": {
+            "parts": [
+              {
+                "text": "I have conducted a competitive intelligence analysis of the pricing page at [mock-competitor.com/pricing](https://mock-competitor.com/pricing) and compared it with our own pricing catalog at SaaSify Inc.\n\nThe comprehensive competitive intelligence report has been compiled and successfully saved locally to:\n📁 **Filepath:** `/Users/harishkumarr/Documents/Kaggle-comp-google/saas-pricing-scout/reports/pricing_scout_mock-competitor.md`\n\nBelow is the complete analysis and the strategic report:\n\n***\n\n# Competitive Intelligence Report: mock-competitor.com vs. SaaSify Inc.\n\n## Executive Summary\nThis report presents a comprehensive competitive analysis of the pricing and product structures of **mock-competitor.com** against **SaaSify Inc.** (our standard plans). \n\nOur analysis reveals that the competitor adopts an aggressive pricing strategy targeted at highly cost-conscious small-to-medium businesses, setting their starter price point at $10/user/month and their mid-tier at $30/user/month. While SaaSify Inc. provides significantly higher value in terms of features—such as workflow automation in our Starter tier, and integrations, 24/7 support, and SLAs in our Professional tier—there is a major pricing gap. Specifically, teams with 6 to 25 users face a massive price jump under SaaSify's current structures, creating an opportunity for mock-competitor.com to capture market share.\n\n---\n\n## Side-by-Side Comparison Table\n\n| Plan Tier | Competitor Plan | Competitor Price | Competitor Key Features | SaaSify Plan | SaaSify Price | SaaSify Key Features |\n| :--- | :--- | :--- | :--- | :--- | :--- | :--- |\n| **Entry-Level** | Starter | $10 / user / month *(billed monthly)* | Up to 5 users, core task management, standard support | Starter | $15 / user / month *(Monthly)*<br>$12 / user / month *(Annual)* | Up to 5 users, core workflow automation, basic dashboard reporting, email support |\n| **Mid-Tier** | Growth | $30 / user / month *(billed monthly)* | Up to 25 users, customized workflows, priority email support, custom reporting | Professional | $49 / user / month *(Monthly)*<br>$39 / user / month *(Annual)* | Up to 50 users, advanced analytics, custom integrations, 24/7 priority support, SLA uptime guarantee |\n| **Enterprise** | Enterprise | Custom | Unlimited users, dedicated account manager, advanced SSO, uptime SLA | Enterprise | Custom | Unlimited users, dedicated account manager, custom security & compliance, SSO, custom SLA |\n\n---\n\n## Price Differentials (Mathematical Analysis)\n\n* **Entry-Level (Starter vs. Starter):**\n  * **Monthly Billing:** SaaSify's Starter plan ($15) is **$5 (50%) more expensive** per user/month than the competitor's Starter plan ($10).\n  * **Annual Billing Equivalent:** SaaSify's annual equivalent ($12) is still **$2 (20%) more expensive** than the competitor's monthly flat rate.\n* **Mid-Tier (Growth vs. Professional):**\n  * **Monthly Billing:** SaaSify's Professional plan ($49) is **$19 (63.3%) more expensive** per user/month than the competitor's Growth plan ($30).\n  * **Annual Billing Equivalent:** SaaSify's annual equivalent ($39) is **$9 (30%) more expensive** than the competitor's monthly flat rate.\n\n---\n\n## Identified Feature Gaps\n\n### SaaSify Inc. Strengths (Competitor Gaps)\n1. **Automation & Reporting at Entry Level:** Our Starter plan offers **core workflow automation** and **basic dashboard reporting**, whereas the competitor only offers basic \"core task management\" at this tier.\n2. **Higher User Caps on Mid-Tier:** Our Professional tier supports up to **50 users**, compared to the competitor's cap of **25 users** on their Growth plan.\n3. **Enterprise-Grade Professional Tier:** SaaSify offers **custom integrations**, **24/7 priority support**, and an **SLA uptime guarantee** in the Professional tier. The competitor locks SLA support entirely behind their custom-priced Enterprise wall and only offers priority *email* support at the mid-tier.\n\n### Competitor Strengths (SaaSify Gaps)\n1. **Intermediate Scaling Path:** The competitor offers a smooth intermediate stepping stone for teams growing past 5 users. A SaaSify customer growing to 6 users is forced to jump from **$15/user/month** (Starter) to **$49/user/month** (Professional)—a **226.7% price increase** per user. Under the competitor's model, they would only move from $10 to $30.\n\n---\n\n## Strategic Recommendations\n\n1. **Leverage and Market Feature Superiority:** We must aggressively highlight our advanced feature set (automation and reporting) at the Starter level to justify the extra $5/month.\n2. **Introduce a Mid-Tier \"Growth\" Plan:** To capture the 6–25 user segment without forcing them to jump to the $49/user/month Professional tier, we recommend introducing a **\"Growth\"** plan at **$29/user/month billed monthly** (or **$24/user/month billed annually**).\n3. **Promote the Annual Discount:** Push annual billing heavily for the Starter plan to align SaaSify's price ($12 equivalent) closer to the competitor's entry point ($10), neutralizing their pricing advantage while securing longer contract commitments.\n\n***\n\n### Next Steps & Action Plan\nTo defend our market share and address this pricing gap, I can export this newly proposed **Growth** tier directly to our production catalog. \n\n**Proposed Growth Tier Specs:**\n* **Name:** Growth\n* **Price Monthly:** $29 (Billed Monthly)\n* **Price Yearly Equivalent:** $24 (Billed Annually)\n* **Key Features:** Up to 25 users, Core workflow automation, Custom dashboard reporting, Priority email support.\n\nWould you like to approve and export this strategic pricing update to the catalog? If you approve, let me know, and I will execute the export process immediately."
+              }
+            ],
+            "role": "model"
+          }
+        }
+      ],
+      "eval_case_id": "analyze_mock_competitor",
+      "agent_data": {
+        "agents": {
+          "coordinator_agent": {
+            "agent_id": "coordinator_agent",
+            "agent_type": "LlmAgent",
+            "description": "",
+            "instruction": "You are the SaaS Pricing & Intelligence Coordinator.\nYour mission is to perform competitive intelligence for our company.\n\nWhen a user asks you to analyze a competitor pricing page (e.g., by URL):\n1. Delegate to the scout_agent to fetch and summarize the competitor's pricing details.\n2. Delegate to the analyst_agent to compare those details with our own internal catalog.\n3. Combine their outputs to generate a comprehensive competitive intelligence report.\n   The report must be in Markdown format and include:\n   - Executive Summary\n   - Side-by-Side Comparison Table (Competitor Tiers vs. Our Tiers)\n   - Price Differentials (mathematical comparisons/percentage differences)\n   - Identified Feature Gaps\n   - Strategic Recommendations (e.g., optimize pricing, introduce a mid-tier, bundle features)\n4. Call the save_intelligence_report tool immediately to save this report to a local file. You MUST invoke save_intelligence_report with the generated report content. This is a mandatory operational gate.\n5. Present the saved report and its filepath to the user.\n6. If the user approves of the recommended strategy, offer to call the export_pricing_strategy tool to write changes to production.",
+            "tools": [
+              {
+                "function_declarations": [
+                  {
+                    "description": "Saves the competitive intelligence report to a local markdown file.\n\nArgs:\n    report_markdown: The markdown content of the generated report.\n    competitor_name: The name or slug of the competitor (used to name the file).\n\nReturns:\n    A dictionary containing the status and the path of the saved report.",
+                    "name": "save_intelligence_report",
+                    "parameters_json_schema": {
+                      "properties": {
+                        "report_markdown": {
+                          "title": "Report Markdown",
+                          "type": "string"
+                        },
+                        "competitor_name": {
+                          "title": "Competitor Name",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "report_markdown",
+                        "competitor_name"
+                      ],
+                      "title": "save_intelligence_reportParams",
+                      "type": "object"
+                    }
+                  }
+                ]
+              },
+              {
+                "function_declarations": [
+                  {
+                    "description": "Simulates exporting the recommended strategic pricing tiers to the production catalog.\n\nWARNING: This is a sensitive action that updates active product pricing structures.\n\nArgs:\n    recommended_tiers: A list of dictionaries representing the recommended new/updated plans.\n                       Each dict should contain 'name', 'price_monthly', and 'features'.\n\nReturns:\n    A dictionary containing the export status.",
+                    "name": "export_pricing_strategy",
+                    "parameters_json_schema": {
+                      "properties": {
+                        "recommended_tiers": {
+                          "items": {},
+                          "title": "Recommended Tiers",
+                          "type": "array"
+                        }
+                      },
+                      "required": [
+                        "recommended_tiers"
+                      ],
+                      "title": "export_pricing_strategyParams",
+                      "type": "object"
+                    }
+                  }
+                ]
+              }
+            ],
+            "sub_agents": [
+              "scout_agent",
+              "analyst_agent"
+            ]
+          },
+          "scout_agent": {
+            "agent_id": "scout_agent",
+            "agent_type": "LlmAgent",
+            "description": "Crawls, fetches, and extracts raw pricing details from competitor URLs.",
+            "instruction": "You are the Scout Agent.\nYour sole job is to fetch and extract raw pricing information from competitor pricing links using the fetch_web_page tool.\nProvide a clean summary of the plan names, prices, billing frequency, and key features found.\nDo not compare them to our own plans—just report the competitor facts.\nOnce you have fetched and summarized the competitor's pricing details, you MUST immediately call the transfer_to_agent tool to route control to the analyst_agent. Do not end your turn without transferring control.",
+            "tools": [
+              {
+                "function_declarations": [
+                  {
+                    "description": "Fetches a web page by URL, parses the HTML, and returns the cleaned text.\n\nArgs:\n    url: The absolute HTTP/HTTPS URL of the web page to fetch.",
+                    "name": "fetch_web_page",
+                    "parameters_json_schema": {
+                      "properties": {
+                        "url": {
+                          "title": "Url",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "url"
+                      ],
+                      "title": "fetch_web_pageParams",
+                      "type": "object"
+                    }
+                  }
+                ]
+              }
+            ],
+            "sub_agents": []
+          },
+          "analyst_agent": {
+            "agent_id": "analyst_agent",
+            "agent_type": "LlmAgent",
+            "description": "Queries our internal pricing catalog and performs mathematical comparison analysis.",
+            "instruction": "You are the Analyst Agent.\nYour job is to fetch our internal SaaS pricing catalog using the get_own_pricing_catalog tool.\nCompare our plans side-by-side with the competitor pricing provided by the Scout Agent.\nCalculate price differences (in percentages), identify features we lack, and highlight gaps or opportunities.\nOnce you have compared the pricing catalog, you MUST immediately call the transfer_to_agent tool to route control back to the coordinator_agent. Do not end your turn without transferring control.",
+            "tools": [
+              {
+                "function_declarations": [
+                  {
+                    "description": "Returns our company's own product pricing catalog (plans, pricing, and features).",
+                    "name": "get_own_pricing_catalog"
+                  }
+                ]
+              }
+            ],
+            "sub_agents": []
+          }
+        },
+        "turns": [
+          {
+            "turn_index": 0,
+            "turn_id": "turn_0",
+            "events": [
+              {
+                "author": "coordinator_agent",
+                "content": {
+                  "parts": [
+                    {
+                      "text": "I have conducted a competitive intelligence analysis of the pricing page at [mock-competitor.com/pricing](https://mock-competitor.com/pricing) and compared it with our own pricing catalog at SaaSify Inc.\n\nThe comprehensive competitive intelligence report has been compiled and successfully saved locally to:\n📁 **Filepath:** `/Users/harishkumarr/Documents/Kaggle-comp-google/saas-pricing-scout/reports/pricing_scout_mock-competitor.md`\n\nBelow is the complete analysis and the strategic report:\n\n***\n\n# Competitive Intelligence Report: mock-competitor.com vs. SaaSify Inc.\n\n## Executive Summary\nThis report presents a comprehensive competitive analysis of the pricing and product structures of **mock-competitor.com** against **SaaSify Inc.** (our standard plans). \n\nOur analysis reveals that the competitor adopts an aggressive pricing strategy targeted at highly cost-conscious small-to-medium businesses, setting their starter price point at $10/user/month and their mid-tier at $30/user/month. While SaaSify Inc. provides significantly higher value in terms of features—such as workflow automation in our Starter tier, and integrations, 24/7 support, and SLAs in our Professional tier—there is a major pricing gap. Specifically, teams with 6 to 25 users face a massive price jump under SaaSify's current structures, creating an opportunity for mock-competitor.com to capture market share.\n\n---\n\n## Side-by-Side Comparison Table\n\n| Plan Tier | Competitor Plan | Competitor Price | Competitor Key Features | SaaSify Plan | SaaSify Price | SaaSify Key Features |\n| :--- | :--- | :--- | :--- | :--- | :--- | :--- |\n| **Entry-Level** | Starter | $10 / user / month *(billed monthly)* | Up to 5 users, core task management, standard support | Starter | $15 / user / month *(Monthly)*<br>$12 / user / month *(Annual)* | Up to 5 users, core workflow automation, basic dashboard reporting, email support |\n| **Mid-Tier** | Growth | $30 / user / month *(billed monthly)* | Up to 25 users, customized workflows, priority email support, custom reporting | Professional | $49 / user / month *(Monthly)*<br>$39 / user / month *(Annual)* | Up to 50 users, advanced analytics, custom integrations, 24/7 priority support, SLA uptime guarantee |\n| **Enterprise** | Enterprise | Custom | Unlimited users, dedicated account manager, advanced SSO, uptime SLA | Enterprise | Custom | Unlimited users, dedicated account manager, custom security & compliance, SSO, custom SLA |\n\n---\n\n## Price Differentials (Mathematical Analysis)\n\n* **Entry-Level (Starter vs. Starter):**\n  * **Monthly Billing:** SaaSify's Starter plan ($15) is **$5 (50%) more expensive** per user/month than the competitor's Starter plan ($10).\n  * **Annual Billing Equivalent:** SaaSify's annual equivalent ($12) is still **$2 (20%) more expensive** than the competitor's monthly flat rate.\n* **Mid-Tier (Growth vs. Professional):**\n  * **Monthly Billing:** SaaSify's Professional plan ($49) is **$19 (63.3%) more expensive** per user/month than the competitor's Growth plan ($30).\n  * **Annual Billing Equivalent:** SaaSify's annual equivalent ($39) is **$9 (30%) more expensive** than the competitor's monthly flat rate.\n\n---\n\n## Identified Feature Gaps\n\n### SaaSify Inc. Strengths (Competitor Gaps)\n1. **Automation & Reporting at Entry Level:** Our Starter plan offers **core workflow automation** and **basic dashboard reporting**, whereas the competitor only offers basic \"core task management\" at this tier.\n2. **Higher User Caps on Mid-Tier:** Our Professional tier supports up to **50 users**, compared to the competitor's cap of **25 users** on their Growth plan.\n3. **Enterprise-Grade Professional Tier:** SaaSify offers **custom integrations**, **24/7 priority support**, and an **SLA uptime guarantee** in the Professional tier. The competitor locks SLA support entirely behind their custom-priced Enterprise wall and only offers priority *email* support at the mid-tier.\n\n### Competitor Strengths (SaaSify Gaps)\n1. **Intermediate Scaling Path:** The competitor offers a smooth intermediate stepping stone for teams growing past 5 users. A SaaSify customer growing to 6 users is forced to jump from **$15/user/month** (Starter) to **$49/user/month** (Professional)—a **226.7% price increase** per user. Under the competitor's model, they would only move from $10 to $30.\n\n---\n\n## Strategic Recommendations\n\n1. **Leverage and Market Feature Superiority:** We must aggressively highlight our advanced feature set (automation and reporting) at the Starter level to justify the extra $5/month.\n2. **Introduce a Mid-Tier \"Growth\" Plan:** To capture the 6–25 user segment without forcing them to jump to the $49/user/month Professional tier, we recommend introducing a **\"Growth\"** plan at **$29/user/month billed monthly** (or **$24/user/month billed annually**).\n3. **Promote the Annual Discount:** Push annual billing heavily for the Starter plan to align SaaSify's price ($12 equivalent) closer to the competitor's entry point ($10), neutralizing their pricing advantage while securing longer contract commitments.\n\n***\n\n### Next Steps & Action Plan\nTo defend our market share and address this pricing gap, I can export this newly proposed **Growth** tier directly to our production catalog. \n\n**Proposed Growth Tier Specs:**\n* **Name:** Growth\n* **Price Monthly:** $29 (Billed Monthly)\n* **Price Yearly Equivalent:** $24 (Billed Annually)\n* **Key Features:** Up to 25 users, Core workflow automation, Custom dashboard reporting, Priority email support.\n\nWould you like to approve and export this strategic pricing update to the catalog? If you approve, let me know, and I will execute the export process immediately."
+                    }
+                  ],
+                  "role": "model"
+                }
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}
