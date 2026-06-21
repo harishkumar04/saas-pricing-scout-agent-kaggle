@@ -85,7 +85,8 @@ Your job is to fetch our internal SaaS pricing catalog using the get_own_pricing
 Compare our plans side-by-side with the competitor pricing provided by the Scout Agent.
 Calculate price differences (in percentages), identify features we lack, and highlight gaps or opportunities.
 Once you have compared the pricing catalog, you MUST immediately call the transfer_to_agent tool to route control back to the coordinator_agent. Do not end your turn without transferring control.""",
-    tools=[get_own_pricing_catalog]
+    tools=[get_own_pricing_catalog],
+    before_tool_callback=domain_safety_guard
 )
 
 # 3. Coordinator Agent: Orchestrates the work, creates reports, and manages sensitive actions
@@ -114,7 +115,8 @@ When a user asks you to analyze a competitor pricing page (e.g., by URL):
 5. Present the saved report and its filepath to the user.
 6. If the user approves of the recommended strategy, offer to call the export_pricing_strategy tool to write changes to production.""",
     sub_agents=[scout_agent, analyst_agent],
-    tools=[save_intelligence_report, export_pricing_tool]
+    tools=[save_intelligence_report, export_pricing_tool],
+    before_tool_callback=domain_safety_guard
 )
 
 app = App(

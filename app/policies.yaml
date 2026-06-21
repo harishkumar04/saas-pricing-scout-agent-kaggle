@@ -1,0 +1,44 @@
+# Gating Policies for Tool Execution Gating (Policy Server Pattern)
+
+environments:
+  local:
+    blocked_tools: []
+
+roles:
+  scout_agent:
+    allowed_tools:
+      - fetch_web_page
+      - transfer_to_agent
+  analyst_agent:
+    allowed_tools:
+      - get_own_pricing_catalog
+      - transfer_to_agent
+  coordinator_agent:
+    allowed_tools:
+      - save_intelligence_report
+      - export_pricing_strategy
+      - transfer_to_agent
+
+security:
+  blocked_keywords:
+    - facebook.com
+    - twitter.com
+    - x.com
+    - instagram.com
+    - linkedin.com
+    - reddit.com
+    - youtube.com
+    - tiktok.com
+    - pinterest.com
+    - tumblr.com
+  blocked_tlds:
+    - .xyz
+    - .top
+    - .click
+    - .gq
+    - .cf
+    - .tk
+    - .ml
+    - .fit
+    - .loan
+    - .work
