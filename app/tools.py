@@ -107,7 +107,7 @@ def export_pricing_strategy(recommended_tiers: list) -> dict:
         }
 
 def post_slack_notification(competitor_name: str, brief_summary: str) -> dict:
-    """Simulates sending a Slack webhook alert notification of competitor pricing changes.
+    """Sends a real Slack webhook alert notification of competitor pricing changes.
 
     Args:
         competitor_name: The name of the competitor analyzed.
@@ -116,10 +116,31 @@ def post_slack_notification(competitor_name: str, brief_summary: str) -> dict:
     Returns:
         A dictionary containing the Slack webhook status.
     """
-    print(f"\n[SLACK NOTIFICATION] Alert posted for competitor: {competitor_name}")
-    print(f"[SLACK NOTIFICATION] Summary: {brief_summary}\n")
-    return {
-        "status": "success",
-        "message": f"Successfully posted Slack notification alert for {competitor_name}.",
-        "channel": "#marketing-pricing-alerts"
-    }
+    import os
+    import httpx
+
+    webhook_url = os.environ.get("SLACK_WEBHOOK_URL")
+    if not webhook_url:
+        return {
+            "status": "error",
+            "error_message": "Slack Webhook URL is not configured in the environment. Please add SLACK_WEBHOOK_URL to your app/.env file."
+        }
+
+    try:
+        payload = {
+            "text": f"🚨 *Competitor Pricing Alert* 🚨\n*Competitor:* {competitor_name}\n*Summary:* {brief_summary}"
+        }
+        with httpx.Client(timeout=10.0) as client:
+            response = client.post(webhook_url, json=payload)
+            response.raise_for_status()
+            
+        return {
+            "status": "success",
+            "message": f"Successfully sent Slack notification alert for {competitor_name} to channel.",
+            "channel": "#marketing-pricing-alerts"
+        }
+    except Exception as e:
+        return {
+            "status": "error",
+            "error_message": f"Failed to post Slack notification: {str(e)}"
+        }
