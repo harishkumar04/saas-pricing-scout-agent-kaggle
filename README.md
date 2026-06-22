@@ -27,7 +27,7 @@ The **SaaS Pricing & Intelligence Scout** automates this workflow end-to-end. It
 *   **Historical Competitor Price Tracking**: Automatically logs competitor pricing configurations during every crawl into a local JSON database (`reports/competitor_history.json`), allowing comparison of current crawl data against past logs to track pricing adjustments.
 *   **Internet Pricing News Search**: Queries external web news and press releases for pricing updates using the `search_competitor_pricing_news` tool to supplement direct page scraping.
 *   **Mermaid Timeline Graph**: Synthesizes the competitor's pricing adjustment history into a visual timeline using Mermaid diagram syntax (`gantt` or flowchart style) that renders natively in the playground report.
-*   **Slack Webhook Notification Alerts**: Simulates real-time alerts using the `post_slack_notification` tool, keeping marketing and sales teams updated when competitors alter their price structure.
+*   **Slack Webhook Notification Alerts**: Sends real-time alerts to a Slack channel using the `post_slack_notification` tool, keeping marketing and sales teams updated when competitors alter their price structure.
 
 ---
 
@@ -125,6 +125,9 @@ Create a file named `app/.env` (or modify the existing one):
 GOOGLE_GENAI_USE_VERTEXAI=False
 GEMINI_API_KEY=YOUR_GEMINI_API_KEY
 GOOGLE_API_KEY=YOUR_GEMINI_API_KEY
+
+# Optional: Add your Slack Webhook URL to receive real-time Slack channel notifications
+SLACK_WEBHOOK_URL=https://hooks.slack.com/services/T000/B000/XXXXXX
 ```
 
 ### 3. Launch the Web Playground
