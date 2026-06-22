@@ -107,6 +107,7 @@ def get_own_pricing_catalog() -> dict:
                     "Custom SLA"
                 ]
             }
+        ]
     }
 
 @mcp.tool()

@@ -23,20 +23,38 @@ from app.app_utils.typing import Feedback
 
 setup_telemetry()
 project_id = "releaseradar-hackathon"
-logger = None
+import logging
+logging.basicConfig(level=logging.INFO)
+
+class FallbackLogger:
+    def log_struct(self, data, severity="INFO"):
+        logging.info(f"[{severity}] {data}")
+
+class SafeLogger:
+    def __init__(self, cloud_logger, fallback):
+        self.cloud_logger = cloud_logger
+        self.fallback = fallback
+
+    def log_struct(self, data, severity="INFO"):
+        try:
+            if self.cloud_logger:
+                self.cloud_logger.log_struct(data, severity=severity)
+                return
+        except Exception:
+            pass
+        self.fallback.log_struct(data, severity=severity)
+
+cloud_logger = None
 try:
     _, credentials_project = google.auth.default()
     if credentials_project:
         project_id = credentials_project
     logging_client = google_cloud_logging.Client()
-    logger = logging_client.logger(__name__)
+    cloud_logger = logging_client.logger(__name__)
 except Exception:
-    import logging
-    logging.basicConfig(level=logging.INFO)
-    class FallbackLogger:
-        def log_struct(self, data, severity="INFO"):
-            logging.info(f"[{severity}] {data}")
-    logger = FallbackLogger()
+    pass
+
+logger = SafeLogger(cloud_logger, FallbackLogger())
 allow_origins = (
     os.getenv("ALLOW_ORIGINS", "").split(",") if os.getenv("ALLOW_ORIGINS") else None
 )
