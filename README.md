@@ -50,12 +50,23 @@ graph TD
     Scout -->|Summary of Competitor Tiers| Coordinator
     Coordinator -->|Delegates| Analyst[Analyst Agent]
     Analyst -->|Tools| Catalog[get_own_pricing_catalog Tool]
+    Analyst -->|Tools| History[get_competitor_history Tool]
+    Analyst -->|Tools| News[search_competitor_pricing_news Tool]
     Catalog -->|Queries Our Catalog| DB[(Internal Pricing DB)]
+    History -->|Reads logs from| HistoryFile[(Local History JSON)]
+    News -->|Queries| WebNews[SaaS Web News & Releases]
     DB -->|Pricing Catalog JSON| Catalog
+    HistoryFile -->|Pricing History Logs| History
+    WebNews -->|Pricing Articles| News
     Catalog -->|Own Tiers| Analyst
-    Analyst -->|Side-by-Side Analysis| Coordinator
+    History -->|Historical Pricing Data| Analyst
+    News -->|Pricing Changes Timeline| Analyst
+    Analyst -->|Side-by-Side & Trend Analysis| Coordinator
     Coordinator -->|Report Generation| SaveReport[save_intelligence_report Tool]
-    SaveReport -->|Saves to reports/| Files[(Local Markdown Files)]
+    SaveReport -->|Saves & appends logs| Files[(Local Markdown Reports)]
+    Files -->|Updates| HistoryFile
+    Coordinator -->|Alerts| SlackWebhook[post_slack_notification Tool]
+    SlackWebhook -->|POST request| Slack[Slack Channel #marketing-pricing-alerts]
     Coordinator -->|Strategic Recommendations| User
     Coordinator -.->|If Approved: Sensitive Action| Export[export_pricing_strategy Tool]
     Export -.->|Requires Confirmation| HIL{Human-in-the-Loop Approval}
