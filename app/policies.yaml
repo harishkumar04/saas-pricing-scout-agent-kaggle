@@ -12,11 +12,14 @@ roles:
   analyst_agent:
     allowed_tools:
       - get_own_pricing_catalog
+      - get_competitor_history
+      - search_competitor_pricing_news
       - transfer_to_agent
   coordinator_agent:
     allowed_tools:
       - save_intelligence_report
       - export_pricing_strategy
+      - post_slack_notification
       - transfer_to_agent
 
 security:
