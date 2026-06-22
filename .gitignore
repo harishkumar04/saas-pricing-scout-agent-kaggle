@@ -18,7 +18,6 @@ artifacts/
 .persist_vector_store
 .saved_chats
 
-# Local Capstone & Demo documentation (excluded from GitHub submission)
 docs/
 
 # Local report database and markdown outputs
