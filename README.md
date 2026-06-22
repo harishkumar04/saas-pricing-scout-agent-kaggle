@@ -59,11 +59,14 @@ graph TD
 ---
 
 ## 🔒 Security & Guardrail Design
-This system demonstrates production-grade safety and security design:
+This system demonstrates production-grade safety and security design following the Zero-Trust guidelines:
 
-*   **Domain Safety Guardrail**: A custom `before_tool_callback` plugin intercepts the scraper tool and validates that URLs are HTTP/HTTPS, blocking social networks and blacklisted/malicious Top-Level Domains (TLDs like `.xyz`, `.top`, `.click`).
-*   **Human-in-the-Loop (HIL) Verification**: Writing recommended pricing tiers back to production databases is a sensitive action. The `export_pricing_strategy` tool is configured with `require_confirmation=True`, which prevents execution until the user manually confirms the action in the playground interface.
-*   **Data Leakage Prevention**: Competitor scraping is done independently without transmitting the internal product database to external APIs.
+*   **Policy Server Pattern**: Relies on a dynamic `PolicyService` ([app/safety.py](file:///Users/harishkumarr/Documents/Kaggle-comp-google/saas-pricing-scout/app/safety.py)) that loads configurations from [app/policies.yaml](file:///Users/harishkumarr/Documents/Kaggle-comp-google/saas-pricing-scout/app/policies.yaml). It implements:
+    *   *Structural Gating (Role-based)*: Restricts tool execution based on the calling agent's name/role.
+    *   *Structural Gating (Domain Safety)*: Intercepts web scraping requests to validate schemes (HTTP/HTTPS only) and block blacklisted domains and suspicious TLDs (e.g. `.xyz`, `.top`).
+*   **Context Hygiene Middleware**: Automatically sanitizes tool arguments before execution. It dynamically resolves bracketed placeholders (e.g. `[[VARIABLE_NAME]]`) from session state or environment variables, preventing prompt injection and data leaks.
+*   **Human-in-the-Loop (HIL) Verification**: Database modifications (writing price recommendations) are secured via `require_confirmation=True` on the `export_pricing_strategy` tool, forcing a confirmation check in the playground before execution.
+*   **Data Leakage Prevention**: Competitor scraping is executed independently without sharing internal catalogs with external APIs.
 
 ---
 
@@ -73,15 +76,20 @@ saas-pricing-scout/
 ├── app/
 │   ├── __init__.py           # App package entry point
 │   ├── .env                  # Environment configurations (API Keys, Project IDs)
-│   ├── agent.py              # Multi-agent definitions, instructions, and callbacks
+│   ├── agent.py              # Multi-agent definitions and prompt instructions
 │   ├── mcp_server.py         # Custom FastMCP server exposing scraper & catalog tools
-│   ├── safety.py             # Domain validation safety plugin
-│   └── tools.py              # Save report and export pricing strategy tools
+│   ├── policies.yaml         # Declarative allowed tools & domain safety blocklists
+│   ├── safety.py             # Policy Service and Context Hygiene middleware
+│   └── tools.py              # Save report and database pricing export tools
+├── specs/
+│   └── pricing_scout_spec.md # BDD Specification (Given/When/Then scenarios)
 ├── tests/
 │   └── eval/
 │       ├── eval_config.yaml  # Metric definitions (safety_check, custom_response_quality)
 │       └── datasets/
 │           └── basic-dataset.json  # Competitor & safety validation cases
+├── AGENTS.md                 # Project coding conventions and guidelines
+├── CHANGELOG.md              # Project history of updates and fixes
 ├── reports/                  # Generated markdown reports
 ├── pyproject.toml            # Dependencies (google-adk, mcp, bs4, httpx)
 └── README.md                 # Complete documentation
