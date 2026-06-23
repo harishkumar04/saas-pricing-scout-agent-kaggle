@@ -46,6 +46,8 @@ from app.mcp_server import fetch_web_page as mcp_fetch_web_page
 from app.mcp_server import get_own_pricing_catalog as mcp_get_own_pricing_catalog
 from app.mcp_server import get_competitor_history as mcp_get_competitor_history
 from app.mcp_server import search_competitor_pricing_news as mcp_search_competitor_pricing_news
+from app.mcp_server import query_pricing_db as mcp_query_pricing_db
+from app.mcp_server import generate_history_chart as mcp_generate_history_chart
 
 # Wrapper functions for MCP tools to ensure 100% compatibility with local evaluation serialization
 async def fetch_web_page(url: str) -> dict:
@@ -76,8 +78,24 @@ def search_competitor_pricing_news(competitor_name: str) -> dict:
     """
     return mcp_search_competitor_pricing_news(competitor_name)
 
+def query_pricing_db(competitor_name: str) -> dict:
+    """Queries the SQLite database for the complete pricing audit history of a competitor.
+
+    Args:
+        competitor_name: The name of the competitor to query.
+    """
+    return mcp_query_pricing_db(competitor_name)
+
+def generate_history_chart(competitor_name: str) -> dict:
+    """Generates a Mermaid graph diagram representing competitor pricing adjustments over time.
+
+    Args:
+        competitor_name: The name of the competitor to generate the chart for.
+    """
+    return mcp_generate_history_chart(competitor_name)
+
 # Define the shared Gemini model as a string to allow auto-routing to AI Studio or Vertex AI
-shared_model = "gemini-2.5-flash"
+shared_model = "gemini-3.5-flash"
 
 # 1. Scout Agent: Crawls and summarizes competitor pricing web pages
 scout_agent = Agent(
@@ -111,7 +129,22 @@ Once you have compared the pricing and built the timeline, you MUST immediately 
     before_tool_callback=domain_safety_guard
 )
 
-# 3. Coordinator Agent: Orchestrates the work, creates reports, and manages sensitive actions
+# 3. DB Analyst Agent: Accesses local SQLite pricing audit history
+db_analyst_agent = Agent(
+    name="db_analyst_agent",
+    model=shared_model,
+    description="Queries the local database for historical pricing data and builds Mermaid line charts of competitor plan prices.",
+    instruction="""You are the Database Analyst Agent.
+Your job is to:
+1. Query the SQLite database using the query_pricing_db tool to fetch historical audits, versions, dates, and report paths.
+2. Generate a visual, interactive Mermaid history chart using the generate_history_chart tool.
+3. Present the list of historical pricing changes, when they occurred, the report files where they are logged, and the generated Mermaid chart to the Coordinator.
+Once you have retrieved the history and generated the chart, you MUST immediately call the transfer_to_agent tool to route control back to the coordinator_agent. Do not end your turn without transferring control.""",
+    tools=[query_pricing_db, generate_history_chart],
+    before_tool_callback=domain_safety_guard
+)
+
+# 4. Coordinator Agent: Orchestrates the work, creates reports, and manages sensitive actions
 export_pricing_tool = FunctionTool(
     export_pricing_strategy,
     require_confirmation=True  # Secures active database modification with HIL gate
@@ -134,11 +167,15 @@ When a user asks you to analyze a competitor pricing page (e.g., by URL):
    - Identified Feature Gaps
    - Historical Pricing Timeline (A visual timeline rendered as a Mermaid diagram showing competitor pricing changes, dates, and amounts)
    - Strategic Recommendations (e.g., optimize pricing, introduce a mid-tier, bundle features)
-4. Call the save_intelligence_report tool immediately to save this report to a local file. You MUST invoke save_intelligence_report with the generated report content. This is a mandatory operational gate.
+4. Call the save_intelligence_report tool immediately to save this report to a local file. You MUST invoke save_intelligence_report with the generated report content and competitor_name.
 5. Call the post_slack_notification tool immediately after saving the intelligence report to post a summary of the competitor changes to the marketing and sales teams.
 6. Present the saved report and its filepath to the user.
-7. If the user approves of the recommended strategy, offer to call the export_pricing_strategy tool to write changes to production.""",
-    sub_agents=[scout_agent, analyst_agent],
+7. If the user approves of the recommended strategy, offer to call the export_pricing_strategy tool to write changes to production.
+
+When a user asks you to query the competitor pricing database or show pricing history charts:
+1. Delegate to the db_analyst_agent to query the local SQLite database and generate the Mermaid chart.
+2. Present the retrieved historical runs, pricing version transitions, and report filepaths to the user.""",
+    sub_agents=[scout_agent, analyst_agent, db_analyst_agent],
     tools=[save_intelligence_report, export_pricing_tool, post_slack_notification],
     before_tool_callback=domain_safety_guard
 )
