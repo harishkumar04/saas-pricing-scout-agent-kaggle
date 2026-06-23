@@ -24,31 +24,33 @@ Keeping up with competitor pricing modifications, tier structures, and package a
 The **SaaS Pricing & Intelligence Scout** automates this workflow end-to-end. It takes a competitor's domain URL, retrieves the page content safely, extracts active pricing plans (tiers, monthly/annual rates, billing terms, and features), compares them to your company's own catalog, and outputs a high-fidelity competitive intelligence report.
 
 ### 🌟 Capstone Enhancements & Features:
-*   **Historical Competitor Price Tracking**: Automatically logs competitor pricing configurations during every crawl into a local JSON database (`reports/competitor_history.json`), allowing comparison of current crawl data against past logs to track pricing adjustments.
+*   **Version-Controlled SQLite Audit Registry**: Automatically records competitor pricing configuration snapshots into a local SQLite database (`reports/competitor_pricing.db`). Tracks plans changes via MD5 hashing and increments version numbers automatically.
+*   **Month-Wise Folder Structure**: Organizes generated markdown intelligence reports chronologically under monthly subdirectories, e.g. `reports/YYYY-MM/pricing_scout_[competitor]_[date]_v[id].md`.
+*   **DB Analyst Agent**: A specialized database query assistant (`db_analyst_agent`) equipped with tools to query the history database and compile visual pricing timeline graphs.
 *   **Internet Pricing News Search**: Queries external web news and press releases for pricing updates using the `search_competitor_pricing_news` tool to supplement direct page scraping.
-*   **Mermaid Timeline Graph**: Synthesizes the competitor's pricing adjustment history into a visual timeline using Mermaid diagram syntax (`gantt` or flowchart style) that renders natively in the playground report.
 *   **Slack Webhook Notification Alerts**: Sends real-time alerts to a Slack channel using the `post_slack_notification` tool, keeping marketing and sales teams updated when competitors alter their price structure.
 
 ---
 
 ## 🏗️ Multi-Agent Architecture
-The system segregates responsibilities among three specialized agents to achieve maximum accuracy and orchestration modularity:
+The system segregates responsibilities among four specialized agents to achieve maximum accuracy and orchestration modularity:
 
 1.  **Coordinator Agent (Root)**: The orchestrator. Receives the user request, runs safety checks, delegates fetching to the Scout, delegates comparisons to the Analyst, compiles the final report, saves it, and manages the database export gate.
 2.  **Scout Agent**: Interacts with the web. Equipped with the `fetch_web_page` tool to safely crawl and summarize raw competitor page contents.
 3.  **Analyst Agent**: Interacts with internal data. Equipped with the `get_own_pricing_catalog` tool to query company plans and perform mathematical/qualitative gap comparisons.
+4.  **DB Analyst Agent**: Interacts with the database. Equipped with `query_pricing_db` and `generate_history_chart` tools to retrieve raw audit histories and generate Mermaid timelines.
 
 ### System Workflow
 ```mermaid
 graph TD
     User([User Request]) --> Coordinator[Coordinator Agent]
-    Coordinator -->|Delegates| Scout[Scout Agent]
+    Coordinator -->|Delegates Scraping| Scout[Scout Agent]
     Scout -->|Tools| Scrape[fetch_web_page Tool]
     Scrape -->|Scrapes Competitor| Web[Competitor Website]
     Web -->|Raw Content| Scrape
     Scrape -->|Cleaned Text| Scout
     Scout -->|Summary of Competitor Tiers| Coordinator
-    Coordinator -->|Delegates| Analyst[Analyst Agent]
+    Coordinator -->|Delegates Analysis| Analyst[Analyst Agent]
     Analyst -->|Tools| Catalog[get_own_pricing_catalog Tool]
     Analyst -->|Tools| History[get_competitor_history Tool]
     Analyst -->|Tools| News[search_competitor_pricing_news Tool]
@@ -62,12 +64,21 @@ graph TD
     History -->|Historical Pricing Data| Analyst
     News -->|Pricing Changes Timeline| Analyst
     Analyst -->|Side-by-Side & Trend Analysis| Coordinator
+    
+    Coordinator -->|Delegates DB Queries| DBAnalyst[DB Analyst Agent]
+    DBAnalyst -->|Tools| QueryDB[query_pricing_db Tool]
+    DBAnalyst -->|Tools| ChartDB[generate_history_chart Tool]
+    QueryDB -->|Queries| SqliteDB[(reports/competitor_pricing.db)]
+    ChartDB -->|Generates Mermaid timeline| DBAnalyst
+    SqliteDB -->|pricing_versions & runs data| QueryDB
+    DBAnalyst -->|Audit Details & Mermaid code| Coordinator
+    
     Coordinator -->|Report Generation| SaveReport[save_intelligence_report Tool]
-    SaveReport -->|Saves & appends logs| Files[(Local Markdown Reports)]
-    Files -->|Updates| HistoryFile
+    SaveReport -->|Saves month-wise md & logs DB| SqliteDB
+    SaveReport -->|Saves markdown report| Files[(reports/YYYY-MM/)]
     Coordinator -->|Alerts| SlackWebhook[post_slack_notification Tool]
     SlackWebhook -->|POST request| Slack[Slack Channel #marketing-pricing-alerts]
-    Coordinator -->|Strategic Recommendations| User
+    Coordinator -->|Strategic Recommendations / Visuals| User
     Coordinator -.->|If Approved: Sensitive Action| Export[export_pricing_strategy Tool]
     Export -.->|Requires Confirmation| HIL{Human-in-the-Loop Approval}
     HIL -->|Yes| DB
@@ -101,13 +112,17 @@ saas-pricing-scout/
 ├── specs/
 │   └── pricing_scout_spec.md # BDD Specification (Given/When/Then scenarios)
 ├── tests/
-│   └── eval/
-│       ├── eval_config.yaml  # Metric definitions (safety_check, custom_response_quality)
-│       └── datasets/
-│           └── basic-dataset.json  # Competitor & safety validation cases
+│   ├── eval/
+│   │   ├── eval_config.yaml  # Metric definitions (safety_check, custom_response_quality)
+│   │   └── datasets/
+│   │       └── basic-dataset.json  # Competitor & safety validation cases
+│   └── unit/
+│       └── test_pricing_scout.py  # Unit tests for policy gating, context resolving, and SQLite tools
 ├── AGENTS.md                 # Project coding conventions and guidelines
 ├── CHANGELOG.md              # Project history of updates and fixes
-├── reports/                  # Generated markdown reports
+├── reports/                  # SQLite DB & month-wise generated markdown reports
+│   ├── competitor_pricing.db # SQLite database tracking price configuration versions
+│   └── YYYY-MM/              # Chronological subdirectories for competitor check runs
 ├── pyproject.toml            # Dependencies (google-adk, mcp, bs4, httpx)
 └── README.md                 # Complete documentation
 ```
