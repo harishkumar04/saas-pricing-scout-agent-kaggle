@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.0] - 2026-06-23
+
+### Added
+- **Local SQLite Competitor Database**: Implemented an SQLite-backed audit registry (`reports/competitor_pricing.db`) to record pricing plans, track version variations using MD5 hashes, and maintain generated report file paths.
+- **db_analyst_agent**: Created a new sub-agent equipped with `query_pricing_db` and `generate_history_chart` tools to extract competitor logs and compile visual Mermaid-based price-history charts.
+- **Comprehensive Unit Tests**: Introduced `tests/unit/test_pricing_scout.py` containing unit test cases to verify role gating policies, context hygiene resolution, SQLite schema initialization, and version-tracking hashes.
+
+### Changed
+- **app/tools.py**: Restructured `save_intelligence_report` to save generated reports under monthly folders (`reports/YYYY-MM/`) and log versioned structures to the SQLite database.
+- **app/policies.yaml**: Granted tool permissions to the new `db_analyst_agent`.
+
 ## [0.2.0] - 2026-06-21
 
 ### Added
