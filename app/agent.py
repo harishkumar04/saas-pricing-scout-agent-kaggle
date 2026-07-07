@@ -95,7 +95,7 @@ def generate_history_chart(competitor_name: str) -> dict:
     return mcp_generate_history_chart(competitor_name)
 
 # Define the shared Gemini model as a string to allow auto-routing to AI Studio or Vertex AI
-shared_model = "gemini-3.5-flash"
+shared_model = "gemini-2.5-flash"
 
 # 1. Scout Agent: Crawls and summarizes competitor pricing web pages
 scout_agent = Agent(
